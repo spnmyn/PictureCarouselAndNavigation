@@ -34,32 +34,25 @@ import java.util.concurrent.TimeUnit;
 public class CarouselNavigationView extends FrameLayout {
     // 使用universal-image-loader插件读取网络图片，需要工程导入universal-image-loader-1.8.6-with-sources.jar
     private ImageLoader imageLoader = ImageLoader.getInstance();
-
-    // 轮播图图片数量
+    // 轮播图片数量
     private final static int IMAGE_COUNT = 5;
-
-    // 自动轮播的时间间隔
+    // 自动轮播时间间隔
     private final static int TIME_INTERVAL = 5;
-
-    // 自动轮播启用开关
+    // 自动轮播开关标志
     private final static boolean isAutoPlay = true;
-
-    // 自定义轮播图的资源
+    // 自定义轮播图资源数组
     private String[] imageUrls;
-
-    // 放轮播图片的ImageView 的list
+    // 存放轮播图片ImageView的List集合
     private List<ImageView> imageViewsList;
-
-    // 放圆点的View的list
+    // 存放圆点的View的List集合
     private List<View> dotViewsList;
-
+    // 声明ViewPager控件
     private ViewPager viewPager;
     // 当前轮播页
     private int currentItem = 0;
-
-    // 定时任务
+    // 线程池（支持周期性和定时处理任务）
     private ScheduledExecutorService scheduledExecutorService;
-
+    // 声明上下文
     private Context context;
 
     // Handler
@@ -86,9 +79,9 @@ public class CarouselNavigationView extends FrameLayout {
     public CarouselNavigationView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         this.context = context;
-
+        // ImageLoader 图片组件初始化方法
         initImageLoader(context);
-
+        // 初始化相关Data方法
         initData();
         if (isAutoPlay) {
             startPlay();
@@ -127,28 +120,28 @@ public class CarouselNavigationView extends FrameLayout {
         if (imageUrls == null || imageUrls.length == 0)
             return;
         LayoutInflater.from(context).inflate(R.layout.carousel_navigation, this, true);
-        LinearLayout dotLayout = (LinearLayout) findViewById(R.id.dotLayout);
-        dotLayout.removeAllViews();
-        // 热点个数与图片特殊相等
+        // 初始化包含导航圆点控件
+        LinearLayout linearLayout = findViewById(R.id.linearLayout);
+        // 移除包含导航圆点布局中的views
+        linearLayout.removeAllViews();
+        // 导航圆点个数与图片资源数量相等
         for (int i = 0; i < imageUrls.length; i++) {
             ImageView view = new ImageView(context);
             view.setTag(imageUrls[i]);
-            if (i == 0)//给一个默认图
+            if (i == 0)// 位置为零处设置默认图
                 view.setBackgroundResource(R.drawable.indicator1);
-            view.setScaleType(ImageView.ScaleType.FIT_XY);
+            view.setScaleType(ImageView.ScaleType.FIT_CENTER);
             imageViewsList.add(view);
 
             ImageView dotView = new ImageView(context);
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
             params.leftMargin = 4;
             params.rightMargin = 4;
-            dotLayout.addView(dotView, params);
+            linearLayout.addView(dotView, params);
             dotViewsList.add(dotView);
         }
-
         viewPager = findViewById(R.id.viewPager);
         viewPager.setFocusable(true);
-
         viewPager.setAdapter(new MyPagerAdapter());
         viewPager.setOnPageChangeListener(new MyPageChangeListener());
     }
@@ -168,9 +161,7 @@ public class CarouselNavigationView extends FrameLayout {
         @Override
         public Object instantiateItem(View container, int position) {
             ImageView imageView = imageViewsList.get(position);
-
             imageLoader.displayImage(imageView.getTag() + "", imageView);
-
             ((ViewPager) container).addView(imageViewsList.get(position));
             return imageViewsList.get(position);
         }
@@ -190,7 +181,6 @@ public class CarouselNavigationView extends FrameLayout {
         @Override
         public void restoreState(Parcelable arg0, ClassLoader arg1) {
             // TODO Auto-generated method stub
-
         }
 
         @Override
@@ -202,13 +192,11 @@ public class CarouselNavigationView extends FrameLayout {
         @Override
         public void startUpdate(View arg0) {
             // TODO Auto-generated method stub
-
         }
 
         @Override
         public void finishUpdate(View arg0) {
             // TODO Auto-generated method stub
-
         }
     }
 
@@ -217,7 +205,6 @@ public class CarouselNavigationView extends FrameLayout {
      * 当ViewPager中页面的状态发生改变时调用
      */
     private class MyPageChangeListener implements ViewPager.OnPageChangeListener {
-
         boolean isAutoPlay = false;
 
         @Override
@@ -246,7 +233,6 @@ public class CarouselNavigationView extends FrameLayout {
         @Override
         public void onPageScrolled(int arg0, float arg1, int arg2) {
             // TODO Auto-generated method stub
-
         }
 
         @Override
@@ -255,9 +241,9 @@ public class CarouselNavigationView extends FrameLayout {
             currentItem = pos;
             for (int i = 0; i < dotViewsList.size(); i++) {
                 if (i == pos) {
-                    ((View) dotViewsList.get(pos)).setBackgroundResource(R.drawable.dot_select);
+                    dotViewsList.get(pos).setBackgroundResource(R.drawable.dot_select);
                 } else {
-                    ((View) dotViewsList.get(i)).setBackgroundResource(R.drawable.dot_normal);
+                    dotViewsList.get(i).setBackgroundResource(R.drawable.dot_normal);
                 }
             }
         }
@@ -286,7 +272,7 @@ public class CarouselNavigationView extends FrameLayout {
             ImageView imageView = imageViewsList.get(i);
             Drawable drawable = imageView.getDrawable();
             if (drawable != null) {
-                //解除drawable对view的引用
+                // 解除drawable对view的引用
                 drawable.setCallback(null);
             }
         }
@@ -300,12 +286,12 @@ public class CarouselNavigationView extends FrameLayout {
         @Override
         protected Boolean doInBackground(String... params) {
             try {
-                // 这里一般调用服务端接口获取一组轮播图片，下面是从百度找的几个图片
+                // 这里一般调用服务端接口获取一组轮播图，下面是从百度找的一组图片
                 imageUrls = new String[]{
-                        "http://image.zcool.com.cn/56/35/1303967876491.jpg",
-                        "http://image.zcool.com.cn/59/54/m_1303967870670.jpg",
-                        "http://image.zcool.com.cn/47/19/1280115949992.jpg",
-                        "http://image.zcool.com.cn/59/11/m_1303967844788.jpg"
+                        "http://img01.taopic.com/150330/240411-1503300Q33280.jpg",
+                        "http://pic.58pic.com/58pic/13/27/83/45f58PICYkZ_1024.jpg",
+                        "http://img4.duitang.com/uploads/blog/201310/19/20131019155006_WLKdZ.thumb.600_0.jpeg",
+                        "http://pic1.win4000.com/wallpaper/6/5603c565201bb.jpg"
                 };
                 return true;
             } catch (Exception e) {
