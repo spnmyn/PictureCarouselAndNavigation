@@ -79,9 +79,9 @@ public class CarouselNavigationView extends FrameLayout {
     public CarouselNavigationView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         this.context = context;
-        // ImageLoader 图片组件初始化方法
+        // ImageLoader图片组件初始化方法
         initImageLoader(context);
-        // 初始化相关Data方法
+        // 初始化数据方法
         initData();
         if (isAutoPlay) {
             startPlay();
@@ -89,7 +89,7 @@ public class CarouselNavigationView extends FrameLayout {
     }
 
     /**
-     * 开始轮播图切换
+     * 开始轮播
      */
     private void startPlay() {
         scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
@@ -97,14 +97,14 @@ public class CarouselNavigationView extends FrameLayout {
     }
 
     /**
-     * 停止轮播图切换
+     * 停止轮播
      */
     private void stopPlay() {
         scheduledExecutorService.shutdown();
     }
 
     /**
-     * 初始化相关Data
+     * 初始化数据
      */
     private void initData() {
         imageViewsList = new ArrayList<>();
@@ -129,7 +129,7 @@ public class CarouselNavigationView extends FrameLayout {
             ImageView view = new ImageView(context);
             view.setTag(imageUrls[i]);
             if (i == 0)// 位置为零处设置默认图
-                view.setBackgroundResource(R.drawable.indicator1);
+                view.setBackgroundResource(R.drawable.indicator);
             view.setScaleType(ImageView.ScaleType.FIT_CENTER);
             imageViewsList.add(view);
 
@@ -147,7 +147,7 @@ public class CarouselNavigationView extends FrameLayout {
     }
 
     /**
-     * 填充ViewPager的页面适配器
+     * ViewPager页面适配器
      */
     private class MyPagerAdapter extends PagerAdapter {
 
@@ -201,8 +201,8 @@ public class CarouselNavigationView extends FrameLayout {
     }
 
     /**
-     * ViewPager的监听器
-     * 当ViewPager中页面的状态发生改变时调用
+     * ViewPager页面监听器
+     * ViewPager页面状态发生改变时调用
      */
     private class MyPageChangeListener implements ViewPager.OnPageChangeListener {
         boolean isAutoPlay = false;
@@ -217,7 +217,7 @@ public class CarouselNavigationView extends FrameLayout {
                 case 2:// 界面切换中
                     isAutoPlay = true;
                     break;
-                case 0:// 滑动结束，即切换完毕或者加载完毕
+                case 0:// 滑动结束，即切换完毕或加载完毕
                     // 当前为最后一张，此时从右向左滑，则切换到第一张
                     if (viewPager.getCurrentItem() == viewPager.getAdapter().getCount() - 1 && !isAutoPlay) {
                         viewPager.setCurrentItem(0);
@@ -250,7 +250,7 @@ public class CarouselNavigationView extends FrameLayout {
     }
 
     /**
-     * 执行轮播图切换任务
+     * 执行轮播任务
      */
     private class SlideShowTask implements Runnable {
 
@@ -272,7 +272,7 @@ public class CarouselNavigationView extends FrameLayout {
             ImageView imageView = imageViewsList.get(i);
             Drawable drawable = imageView.getDrawable();
             if (drawable != null) {
-                // 解除drawable对view的引用
+                // 解除Drawable对View的引用
                 drawable.setCallback(null);
             }
         }
@@ -286,7 +286,7 @@ public class CarouselNavigationView extends FrameLayout {
         @Override
         protected Boolean doInBackground(String... params) {
             try {
-                // 这里一般调用服务端接口获取一组轮播图，下面是从百度找的一组图片
+                // 调用服务端接口获取一组轮播图
                 imageUrls = new String[]{
                         "http://img01.taopic.com/150330/240411-1503300Q33280.jpg",
                         "http://pic.58pic.com/58pic/13/27/83/45f58PICYkZ_1024.jpg",
